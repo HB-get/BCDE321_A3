@@ -59,7 +59,6 @@ class Game:
             if self._movement.need_zombie_door():
                 self._state.start_zombie_door()
             elif self._state.get_has_ended_turn():
-                print("###############")
                 self._state.start_new_turn()
 
     def reset(self, map_seed: int | None = None) -> None:

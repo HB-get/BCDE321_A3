@@ -164,6 +164,9 @@ class FakeGameState:
     def start_new_turn(self) -> None:
         self.start_new_turn_calls += 1
 
+class FakeTile:
+    def get_door_directions(self):
+        return ()
 
 class FakeMovement:
     """Fake Movement used to isolate Game from the map/map domain."""
@@ -243,6 +246,12 @@ class FakeMovement:
 
     def get_map_dimensions(self):
         return 0, 0
+
+    # get_debug_msgs reads these two GameMap members directly, so the fake provides them
+    _GameMap__display_tiles = {(0, 0): FakeTile()}
+
+    def _GameMap__calculate_position(self, position, direction) -> Result:
+        return Result.success((0, 0))
 
 
 class FakeItems:

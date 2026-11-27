@@ -1,5 +1,6 @@
 import pytest
 
+from zimp.domain.common.dev_card import CardEffect, CardEffectType
 from zimp.domain.common.direction import Direction
 from zimp.domain.common.error_code import ErrorCode
 from zimp.domain.common.item_code import ItemCode
@@ -547,3 +548,27 @@ class TestGameGoodDay:
 
         assert result.is_fail()
         assert result.get_error_code() == ErrorCode.NOT_WON_OR_LOST
+
+    # -----------------------------------------------------------------------------------------------------------
+    # A3 baseline updated tests
+    # -----------------------------------------------------------------------------------------------------------
+
+    def test_move_player_in_debug_mode_applies_drawn_card(self, game):
+        _, state, movement, items, events = game
+        debug_game = Game(state=state, movement=movement, items=items, events=events, debug=True)
+        effect = CardEffect(CardEffectType.ZOMBIES, 4)
+        events.draw_event_result = Result.success(effect)
+
+        assert debug_game.move_player(Direction.NORTH) is None
+        assert state.apply_card_effect_calls == [effect]
+
+    def test_get_debug_msgs_when_not_placing_a_tile(self, game):
+        game, state, movement, items, events = game
+
+        assert game.get_debug_msgs().startswith("Health: 5")
+
+    def test_get_debug_msgs_while_placing_a_tile(self, game):
+        game, state, movement, items, events = game
+        state.is_moving = True
+
+        assert game.get_debug_msgs().startswith("Health: 5")
