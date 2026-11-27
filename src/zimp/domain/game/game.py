@@ -7,6 +7,7 @@ from zimp.domain.common.direction import Direction
 from zimp.domain.common.error_code import ErrorCode
 from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
+from zimp.domain.game.attack_action import AttackAction
 
 from zimp.domain.game.game_context import GameContext
 from zimp.domain.game.move_player_action import MovePlayerAction
@@ -93,32 +94,7 @@ class Game:
         return PickZombieDoorAction(self._ctx, direction).run()
 
     def attack(self, use_chainsaw: bool = False, instant_kill: bool = False) -> ErrorCode | None:
-        """Fight any zombies on the current tile"""
-        if not self._state.get_can_attack():
-            return ErrorCode.CANT_ATTACK
-
-        if instant_kill:
-            if not self._items.get_has_instant_kill():
-                return ErrorCode.NO_INSTANT_KILL
-            self._items.discard(0)
-            self._items.discard(1)
-
-        attack_bonus_result = self._items.attack_bonus(use_chainsaw)
-        if attack_bonus_result.is_fail():
-            return attack_bonus_result.get_error_code()
-
-        attack_bonus = attack_bonus_result.get_data()
-        self._state.attack(attack_bonus, instant_kill)
-
-        self._items.record_battle()
-
-        self._do_post_event_checks()
-
-        # yucky debug
-        self._debug_msgs += ["ATTACKED | "]
-        # end yucky debug
-
-        return None
+        return AttackAction(self._ctx, use_chainsaw, instant_kill).run()
 
     def flee(self, direction: Direction, with_oil: bool = False) -> ErrorCode | None:
         """Flee to a previously explored tile"""
