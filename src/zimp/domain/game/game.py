@@ -10,6 +10,7 @@ from zimp.domain.common.result import Result
 
 from zimp.domain.game.game_context import GameContext
 from zimp.domain.game.move_player_action import MovePlayerAction
+from zimp.domain.game.pick_zombie_door_action import PickZombieDoorAction
 from zimp.domain.game.place_tile_action import PlaceTileAction
 from zimp.domain.game.rotate_tile_action import RotateTileAction
 
@@ -89,17 +90,7 @@ class Game:
         return PlaceTileAction(self._ctx).run()
 
     def pick_zombie_door(self, direction: Direction) -> ErrorCode | None:
-        """Trigger a zombie door attack in the selected direction"""
-        if not self._state.get_is_zombie_door():
-            return ErrorCode.NOT_ZOMBIE_DOOR
-
-        zombie_door_result = self._movement.create_zombie_door(direction)
-        if isinstance(zombie_door_result, ErrorCode):
-            return zombie_door_result
-
-        self._state.confirm_zombie_door()
-
-        return None
+        return PickZombieDoorAction(self._ctx, direction).run()
 
     def attack(self, use_chainsaw: bool = False, instant_kill: bool = False) -> ErrorCode | None:
         """Fight any zombies on the current tile"""
