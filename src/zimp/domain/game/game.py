@@ -8,6 +8,7 @@ from zimp.domain.common.error_code import ErrorCode
 from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
 from zimp.domain.game.attack_action import AttackAction
+from zimp.domain.game.discard_item_action import DiscardItemAction
 from zimp.domain.game.dont_search_item_action import DontSearchItemAction
 from zimp.domain.game.dont_take_item_action import DontTakeItemAction
 from zimp.domain.game.flee_action import FleeAction
@@ -117,12 +118,7 @@ class Game:
         return DontTakeItemAction(self._ctx).run()
 
     def discard_item(self, slot_id: int) -> ErrorCode | None:
-        """Discard the chosen item from the items"""
-        discard_result = self._items.discard(slot_id)
-        if isinstance(discard_result, ErrorCode):
-            return discard_result
-
-        return None
+        return DiscardItemAction(self._ctx, slot_id).run()
 
     def use_item(self, item_id: ItemCode) -> ErrorCode | None:
         """Use the chosen item (gasoline or soda)"""
