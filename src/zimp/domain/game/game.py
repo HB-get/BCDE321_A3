@@ -8,6 +8,8 @@ from zimp.domain.common.error_code import ErrorCode
 from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
 
+from zimp.domain.game.game_context import GameContext
+
 
 class Game:
     """Boundary class connecting the controller to domain components"""
@@ -24,6 +26,8 @@ class Game:
         self._events = events
         self._items = items
         self._movement = movement
+
+        self._ctx = GameContext(state, movement, items, events)
 
         self.reset(map_seed)
 
