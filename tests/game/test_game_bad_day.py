@@ -421,3 +421,19 @@ class TestGameBadDay:
         assert result == ErrorCode.FATAL_ERROR
         assert state.apply_card_effect_calls == []
         assert state.start_new_turn_calls == 0
+
+    # -----------------------------------------------------------------------------------------------------------
+    # Regression protection tests from AI recommendation
+    # -----------------------------------------------------------------------------------------------------------
+
+    def test_end_turn_during_events_propagates_event_draw_error(self, game):
+        game, state, _, _, events = game
+
+        state.is_doing_events = True
+        events.draw_event_result = Result.fail(ErrorCode.FATAL_ERROR)
+
+        result = game.end_turn()
+
+        assert result == ErrorCode.FATAL_ERROR
+        assert state.apply_card_effect_calls == []
+        assert state.start_new_turn_calls == 0

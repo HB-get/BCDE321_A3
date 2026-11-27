@@ -572,3 +572,32 @@ class TestGameGoodDay:
         state.is_moving = True
 
         assert game.get_debug_msgs().startswith("Health: 5")
+
+    # -----------------------------------------------------------------------------------------------------------
+    # Regression protection tests from AI recommendation
+    # -----------------------------------------------------------------------------------------------------------
+
+    def test_dont_take_item_abandons_found_item(self, game):
+        game, state, _, items, _ = game
+
+        state.has_found_item = True
+
+        result = game.dont_take_item()
+
+        assert result is None
+        assert items.dont_take_item_calls == 1
+        assert state.end_found_item_calls == 1
+
+    def test_dont_take_item_performs_post_event_checks(self, game):
+        game, state, movement, items, _ = game
+
+        state.has_found_item = True
+        state.can_end_turn = True
+        movement.needs_zombie_door = True
+        state.has_ended_turn = True
+
+        result = game.dont_take_item()
+
+        assert result is None
+        assert state.start_zombie_door_calls == 1
+        assert state.start_new_turn_calls == 0
