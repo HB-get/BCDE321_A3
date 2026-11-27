@@ -20,6 +20,7 @@ from zimp.domain.game.place_tile_action import PlaceTileAction
 from zimp.domain.game.rotate_tile_action import RotateTileAction
 from zimp.domain.game.search_item_action import SearchItemAction
 from zimp.domain.game.take_item_action import TakeItemAction
+from zimp.domain.game.use_item_action import UseItemAction
 
 
 class Game:
@@ -121,16 +122,7 @@ class Game:
         return DiscardItemAction(self._ctx, slot_id).run()
 
     def use_item(self, item_id: ItemCode) -> ErrorCode | None:
-        """Use the chosen item (gasoline or soda)"""
-        use = self._items.use(item_id)
-
-        if isinstance(use, ErrorCode):
-            return use
-
-        if item_id == ItemCode.SODA:
-            self._state.drink_soda()
-
-        return None
+        return UseItemAction(self._ctx, item_id).run()
 
     def end_turn(self, is_cower: bool = False) -> ErrorCode | None:
         """End the current turn, optionally cowering"""
