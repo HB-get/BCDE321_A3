@@ -44,40 +44,6 @@ class Game:
 
         self.reset(map_seed)
 
-        # yucky debug
-        self._debug_msgs = []
-        self._debug = debug
-        self._debug_direction = Direction.NORTH
-        # end yucky debug
-
-    def _draw_event_card(self) -> ErrorCode | None:
-        draw_result, shuffled = self._events.draw_event(self._state.get_time())
-        if draw_result.is_fail():
-            return draw_result.get_error_code()
-
-        # yucky debug
-        if self._debug:
-            effect = draw_result.get_data()
-            self._debug_msgs += ["CARD" + (f"{effect.effect_type.name}: {effect.value}"
-                                           if effect.effect_type in (CardEffectType.ZOMBIES, CardEffectType.HEALTH)
-                                           else effect.effect_type.name) + " | "]
-        # end yucky debug
-
-        self._state.apply_card_effect(draw_result.get_data())
-        if shuffled:
-            self._state.advance_time()
-
-        self._do_post_event_checks()
-
-        return None
-
-    def _do_post_event_checks(self) -> None:
-        if self._state.get_can_end_turn():
-            if self._movement.need_zombie_door():
-                self._state.start_zombie_door()
-            elif self._state.get_has_ended_turn():
-                self._state.start_new_turn()
-
     def reset(self, map_seed: int | None = None) -> None:
         """Reset all game components"""
         self._state.reset()
@@ -85,8 +51,8 @@ class Game:
         self._movement.reset(randomizer_seed=map_seed)  # 408
         self._items.reset()
 
-        # yucky debug
-        self._debug_msgs = []
+        # Debug code - retained to preserve behaviour
+        self._ctx.log = []
         # end yucky debug
 
     def move_player(self, direction: Direction) -> ErrorCode | None:
@@ -148,10 +114,10 @@ class Game:
 
         if self._state.get_is_moving():
             player = self._movement._GameMap__calculate_position(self._movement.get_player_position(),
-                                                                 self._debug_direction).get_data()
+                                                                 self._ctx.last_direction).get_data()
         else:
             player = self._movement.get_player_position()
         doors = self._movement._GameMap__display_tiles.get(player).get_door_directions()
         return f"Health: {hp}, Attack: {attack}, Items: {items}, Time: {time}, Cards: {cards}\n" \
             + f"{doors}\n" \
-            + " ".join(self._debug_msgs)
+            + " ".join(self._ctx.log)
