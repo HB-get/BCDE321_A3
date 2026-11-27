@@ -15,6 +15,7 @@ from zimp.domain.game.move_player_action import MovePlayerAction
 from zimp.domain.game.pick_zombie_door_action import PickZombieDoorAction
 from zimp.domain.game.place_tile_action import PlaceTileAction
 from zimp.domain.game.rotate_tile_action import RotateTileAction
+from zimp.domain.game.search_item_action import SearchItemAction
 
 
 class Game:
@@ -101,24 +102,7 @@ class Game:
         return FleeAction(self._ctx, direction, with_oil).run()
 
     def perform_search_for_item(self) -> ErrorCode | None:
-        """Draw a new card to find an item"""
-        if not self._state.get_is_searching_item():
-            return ErrorCode.CANT_SEARCH_NOW
-
-        draw_result, shuffled = self._events.draw_item()
-        if not draw_result.is_fail():
-            item = draw_result.get_data()
-            self._items.find_item(item)
-            self._state.find_item()
-
-            if shuffled:
-                self._state.advance_time()
-
-            # yucky debug
-            self._debug_msgs += [f"FOUND {str(item)} | "]
-            # end yucky debug
-
-        return draw_result.get_error_code()
+        return SearchItemAction(self._ctx).run()
 
     def ignore_search_for_item(self) -> ErrorCode | None:
         """Choose not to draw a card to find an item"""
