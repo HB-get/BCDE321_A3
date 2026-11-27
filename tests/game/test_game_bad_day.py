@@ -409,5 +409,15 @@ class TestGameBadDay:
 
 
     # -----------------------------------------------------------------------------------------------------------
-    # check_win_loss
+    # A3 baseline updated tests
     # -----------------------------------------------------------------------------------------------------------
+
+    def test_move_player_returns_error_when_event_draw_fails(self, game):
+        game, state, movement, items, events = game
+        events.draw_event_result = Result.fail(ErrorCode.FATAL_ERROR)
+
+        result = game.move_player(Direction.NORTH)
+
+        assert result == ErrorCode.FATAL_ERROR
+        assert state.apply_card_effect_calls == []
+        assert state.start_new_turn_calls == 0
