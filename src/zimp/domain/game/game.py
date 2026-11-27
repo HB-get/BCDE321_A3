@@ -9,6 +9,7 @@ from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
 
 from zimp.domain.game.game_context import GameContext
+from zimp.domain.game.move_player_action import MovePlayerAction
 
 
 class Game:
@@ -77,23 +78,7 @@ class Game:
         # end yucky debug
 
     def move_player(self, direction: Direction) -> ErrorCode | None:
-        """Attempt to move the player in a given direction"""
-        if not self._state.get_can_move():
-            return ErrorCode.CANT_MOVE_NOW
-
-        move_result = self._movement.move(direction)
-        if isinstance(move_result, ErrorCode):
-            return move_result
-
-        if self._movement.is_placement_mode_on():  # Unknown tile
-            self._state.start_move()
-            return None
-
-        # yucky debug
-        self._debug_direction = direction
-        # end yucky debug
-
-        return self._draw_event_card()  # Known tile, skip placement
+        return MovePlayerAction(self._ctx, direction).run()
 
     def rotate_tile(self) -> ErrorCode | None:
         """Rotate the drawn tile in a given direction"""
