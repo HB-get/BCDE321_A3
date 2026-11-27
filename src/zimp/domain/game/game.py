@@ -20,6 +20,7 @@ from zimp.domain.game.place_tile_action import PlaceTileAction
 from zimp.domain.game.rotate_tile_action import RotateTileAction
 from zimp.domain.game.search_item_action import SearchItemAction
 from zimp.domain.game.take_item_action import TakeItemAction
+from zimp.domain.game.end_turn_action import EndTurnAction
 from zimp.domain.game.use_item_action import UseItemAction
 
 
@@ -125,37 +126,7 @@ class Game:
         return UseItemAction(self._ctx, item_id).run()
 
     def end_turn(self, is_cower: bool = False) -> ErrorCode | None:
-        """End the current turn, optionally cowering"""
-        if not self._state.get_can_end_turn():
-            return ErrorCode.CANT_END_TURN_NOW
-
-        if is_cower:
-            cower_action = self._state.cower()
-            if cower_action.is_fail():
-                return cower_action.get_error_code()
-
-            cower_event, shuffled = self._events.waste_time()
-            if cower_event.is_fail():
-                return cower_event.get_error_code()
-            if shuffled:
-                self._state.advance_time()
-
-        tile_effect = self._movement.get_tile_effect()
-
-        # yucky debug
-        self._debug_msgs += [f"TILE {str(tile_effect)} | "]
-        # end yucky debug
-
-        self._state.do_end_turn_effect(tile_effect)
-
-        if self._state.get_is_doing_events():  # temple or graveyard
-            return self._draw_event_card()
-        elif self._state.get_is_searching_item():
-            pass
-        else:  # heal or none
-            self._state.start_new_turn()
-
-        return None
+        return EndTurnAction(self._ctx, is_cower).run()
 
     def check_win_loss(self) -> Result:
         """To be called after each action; determines if the player has won or lost"""
