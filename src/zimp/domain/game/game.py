@@ -8,6 +8,7 @@ from zimp.domain.common.error_code import ErrorCode
 from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
 from zimp.domain.game.attack_action import AttackAction
+from zimp.domain.game.dont_search_item_action import DontSearchItemAction
 from zimp.domain.game.flee_action import FleeAction
 
 from zimp.domain.game.game_context import GameContext
@@ -105,19 +106,7 @@ class Game:
         return SearchItemAction(self._ctx).run()
 
     def ignore_search_for_item(self) -> ErrorCode | None:
-        """Choose not to draw a card to find an item"""
-        if not self._state.get_is_searching_item():
-            return ErrorCode.CANT_SEARCH_NOW
-
-        self._state.end_searching_item()
-
-        self._do_post_event_checks()
-
-        # yucky debug
-        self._debug_msgs += [f"NO SEARCH | "]
-        # end yucky debug
-
-        return None
+        return DontSearchItemAction(self._ctx).run()
 
     def take_item(self) -> ErrorCode | None:
         """Add the found item to the items"""
