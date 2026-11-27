@@ -10,6 +10,7 @@ from zimp.domain.common.result import Result
 
 from zimp.domain.game.game_context import GameContext
 from zimp.domain.game.move_player_action import MovePlayerAction
+from zimp.domain.game.place_tile_action import PlaceTileAction
 from zimp.domain.game.rotate_tile_action import RotateTileAction
 
 
@@ -85,17 +86,7 @@ class Game:
         return RotateTileAction(self._ctx).run()
 
     def place_tile(self) -> ErrorCode | None:
-        """Attempt to place the drawn tile"""
-        if not self._state.get_is_moving():
-            return ErrorCode.CANT_PLACE_NOW
-
-        place_result = self._movement.lock_placement_tile()
-        if isinstance(place_result, ErrorCode):
-            return place_result
-
-        self._state.end_move()
-
-        return self._draw_event_card()
+        return PlaceTileAction(self._ctx).run()
 
     def pick_zombie_door(self, direction: Direction) -> ErrorCode | None:
         """Trigger a zombie door attack in the selected direction"""
