@@ -10,6 +10,7 @@ from zimp.domain.common.result import Result
 
 from zimp.domain.game.game_context import GameContext
 from zimp.domain.game.move_player_action import MovePlayerAction
+from zimp.domain.game.rotate_tile_action import RotateTileAction
 
 
 class Game:
@@ -81,11 +82,7 @@ class Game:
         return MovePlayerAction(self._ctx, direction).run()
 
     def rotate_tile(self) -> ErrorCode | None:
-        """Rotate the drawn tile in a given direction"""
-        if not self._state.get_is_moving():
-            return ErrorCode.CANT_ROTATE_NOW
-
-        return self._movement.rotate_placement_tile()
+        return RotateTileAction(self._ctx).run()
 
     def place_tile(self) -> ErrorCode | None:
         """Attempt to place the drawn tile"""
