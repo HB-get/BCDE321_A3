@@ -17,6 +17,7 @@ from zimp.domain.game.pick_zombie_door_action import PickZombieDoorAction
 from zimp.domain.game.place_tile_action import PlaceTileAction
 from zimp.domain.game.rotate_tile_action import RotateTileAction
 from zimp.domain.game.search_item_action import SearchItemAction
+from zimp.domain.game.take_item_action import TakeItemAction
 
 
 class Game:
@@ -109,23 +110,7 @@ class Game:
         return DontSearchItemAction(self._ctx).run()
 
     def take_item(self) -> ErrorCode | None:
-        """Add the found item to the items"""
-        if not self._state.get_has_found_item():
-            return ErrorCode.HAVENT_FOUND_ITEM
-
-        add_item = self._items.keep_found_item()
-        if isinstance(add_item, ErrorCode):
-            return add_item
-
-        self._state.end_found_item()
-
-        self._do_post_event_checks()
-
-        # yucky debug
-        self._debug_msgs += [f"KEEP | "]
-        # end yucky debug
-
-        return None
+        return TakeItemAction(self._ctx).run()
 
     def dont_take_item(self) -> ErrorCode | None:
         """Abandon the item that was found"""
