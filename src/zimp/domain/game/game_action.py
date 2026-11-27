@@ -61,3 +61,7 @@ class GameAction(ABC):
                 self._ctx.state.start_zombie_door()
             elif self._ctx.state.get_has_ended_turn():
                 self._ctx.state.start_new_turn()
+
+    def _is_error(self, result: object) -> ErrorCode | None:
+        """Treat an ErrorCode result as a failure and anything else as success"""
+        return result if isinstance(result, ErrorCode) else None
