@@ -780,7 +780,7 @@ class TestIntegration:
             print(game.place_tile())
             print(game.attack())
             print(game.end_turn())
-            print(game._state.get_hp())
+            print(game._ctx.state.get_hp())
 
         result = game.check_win_loss()
 
