@@ -9,6 +9,7 @@ from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
 from zimp.domain.game.attack_action import AttackAction
 from zimp.domain.game.dont_search_item_action import DontSearchItemAction
+from zimp.domain.game.dont_take_item_action import DontTakeItemAction
 from zimp.domain.game.flee_action import FleeAction
 
 from zimp.domain.game.game_context import GameContext
@@ -113,20 +114,7 @@ class Game:
         return TakeItemAction(self._ctx).run()
 
     def dont_take_item(self) -> ErrorCode | None:
-        """Abandon the item that was found"""
-        if not self._state.get_has_found_item():
-            return ErrorCode.HAVENT_FOUND_ITEM
-
-        self._items.dont_take_item()
-        self._state.end_found_item()
-
-        self._do_post_event_checks()
-
-        # yucky debug
-        self._debug_msgs += [f"DON'T KEEP | "]
-        # end yucky debug
-
-        return None
+        return DontTakeItemAction(self._ctx).run()
 
     def discard_item(self, slot_id: int) -> ErrorCode | None:
         """Discard the chosen item from the items"""
