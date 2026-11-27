@@ -27,7 +27,7 @@ class Game:
         self._items = items
         self._movement = movement
 
-        self._ctx = GameContext(state, movement, items, events)
+        self._ctx = GameContext(state, movement, items, events, debug)
 
         self.reset(map_seed)
 
