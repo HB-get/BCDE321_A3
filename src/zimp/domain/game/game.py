@@ -8,6 +8,7 @@ from zimp.domain.common.error_code import ErrorCode
 from zimp.domain.common.item_code import ItemCode
 from zimp.domain.common.result import Result
 from zimp.domain.game.attack_action import AttackAction
+from zimp.domain.game.flee_action import FleeAction
 
 from zimp.domain.game.game_context import GameContext
 from zimp.domain.game.move_player_action import MovePlayerAction
@@ -97,28 +98,7 @@ class Game:
         return AttackAction(self._ctx, use_chainsaw, instant_kill).run()
 
     def flee(self, direction: Direction, with_oil: bool = False) -> ErrorCode | None:
-        """Flee to a previously explored tile"""
-        if not self._state.get_can_flee():
-            return ErrorCode.CANT_FLEE
-
-        if with_oil and not self._items.get_has_oil():
-            return ErrorCode.NO_OIL
-
-        flee_move = self._movement.flee(direction)
-        if isinstance(flee_move, ErrorCode):
-            return flee_move
-
-        self._state.flee(with_oil)
-
-        if with_oil:
-            self._items.use(ItemCode.OIL)
-
-        self._do_post_event_checks()
-
-        # yucky debug
-        self._debug_msgs += ["FLED | "]
-        # end yucky debug
-        return None
+        return FleeAction(self._ctx, direction, with_oil).run()
 
     def perform_search_for_item(self) -> ErrorCode | None:
         """Draw a new card to find an item"""
