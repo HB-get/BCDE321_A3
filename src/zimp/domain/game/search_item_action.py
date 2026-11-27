@@ -3,8 +3,6 @@ from zimp.domain.game.game_action import GameAction
 
 
 class SearchItemAction(GameAction):
-    settles_events = True
-
     def _can_run(self) -> ErrorCode | None:
         return None if self._ctx.state.get_is_searching_item() else ErrorCode.CANT_SEARCH_NOW
 
